@@ -36,7 +36,7 @@ namespace Authentication.Helpers
                 Subject = new ClaimsIdentity(claims),
                 Issuer = jwtIssuer,
                 Audience = jwtIssuer,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),// why sha256
                 NotBefore = DateTime.UtcNow,
                 Expires = DateTime.UtcNow.AddHours(7)
 

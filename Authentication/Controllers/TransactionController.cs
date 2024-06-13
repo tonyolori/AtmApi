@@ -36,7 +36,7 @@ namespace AtmApi.Controllers
                 return BadRequest(ex.Message);
             }
 
-            return base.Ok(user.GetBalance());
+            return base.Ok(user.GetBalance());//pass back a balancxe response or text
         }
 
         [HttpPost("deposit")]

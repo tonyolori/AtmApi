@@ -27,21 +27,21 @@ namespace Authentication.Database
             return user;
         }
 
-        public async Task<User?> GetUserByEmailAsync(string email)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
-            User? user = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
 
-            return user;
+
+            return await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
         }
-        public async Task<User?> GetUserByAccountNumberAsync(long accountNumber )
+        public async Task<User?> GetUserByAccountNumberAsync(long accountNumber)
         {
             User? user = await _context.Users
                     .FirstOrDefaultAsync(u => u.AccountNumber == accountNumber);
 
             return user;
         }
-        
+
 
         public async Task<List<long>> GetAllAdminsAsync()
         {
@@ -83,6 +83,6 @@ namespace Authentication.Database
             return await _context.Users.AnyAsync(u => u.AccountNumber == accountNumber);
         }
 
-       
+
     }
 }

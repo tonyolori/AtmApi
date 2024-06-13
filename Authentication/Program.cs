@@ -8,12 +8,27 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Application;
+using Infrastructure;
+using Contracts;
+using Serilog;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Jwt configuration starts here
 var jwtIssuer = builder.Configuration.GetSection("Jwt:Issuer").Get<string>();
 var jwtKey = builder.Configuration.GetSection("Jwt:Key").Get<string>();
+
+//clean code stuff here 
+builder.Services
+    .AddApplication()
+    .AddInfrastructure()
+    .AddContracts();
+
+//builder.Host.UseSerilog((context, configuration) =>
+//configuration.ReadFrom.Configuration(context.Configuration));
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  .AddJwtBearer(options =>

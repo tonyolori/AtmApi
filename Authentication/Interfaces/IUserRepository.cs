@@ -4,19 +4,19 @@ namespace Authentication.Interfaces
 {
     public interface IUserRepository
     {
-        public Task<List<User>> GetUsersAsync();
-        public Task<User?> GetUserAsync(int id);
-        public void AddUser(User user);
+        Task<List<User>> GetUsersAsync();
+        Task<User?> GetUserAsync(int id);
+        void AddUser(User user);
 
-        public void UpdateUserAsync(User user);
-        public void DeleteUser(User user);
+        void UpdateUserAsync(User user);
+        void DeleteUser(User user);
 
-        public void SaveChanges();
-        public Task<User?> GetUserByEmailAsync(string email);
-        public Task<User?> GetUserByAccountNumberAsync(long accountNumber);
+        void SaveChanges();
+        Task<User> GetUserByEmailAsync(string email);
+        Task<User?> GetUserByAccountNumberAsync(long accountNumber);
 
-        public Task<bool> DoesUserIdExistAsync(long accountNumber);
-        public Task<List<long>> GetAllAdminsAsync();
+        Task<bool> DoesUserIdExistAsync(long accountNumber);
+        Task<List<long>> GetAllAdminsAsync();
 
     }
 }

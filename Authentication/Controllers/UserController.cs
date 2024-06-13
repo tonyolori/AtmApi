@@ -28,7 +28,7 @@ namespace Authentication.Controllers
 
         [HttpPost("register")]
         [ValidateEmail]
-        [ValidatePassword]
+        [ValidatePassword]// mediator pattern and fluent validation
         public async Task<ActionResult> Register(UserDto user)
         {
             if (user.FirstName.ToLower().Equals(user.LastName.ToLower()))
