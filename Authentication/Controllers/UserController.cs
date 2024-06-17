@@ -1,10 +1,9 @@
-﻿using AtmApi.ActionFilters;
-using Authentication.ActionFilters;
-using Authentication.Enum;
-using Authentication.Helpers;
-using Authentication.Interfaces;
+﻿using Authentication.ActionFilters;
+using Application.Helpers;
+using Infrastructure.Interfaces;
 using Authentication.Logic;
-using Authentication.Models;
+using Domain.Enum;
+using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -73,7 +72,7 @@ namespace Authentication.Controllers
         public async Task<ActionResult> Login(string Email, string Password)
         {
             //verify user exists
-            bool validateInfo = await _authHelper.ValidateCredentials(Email, Password);
+            bool validateInfo = await _userRepository.ValidateCredentials(Email, Password);
 
             if (!validateInfo)
             {

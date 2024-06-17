@@ -4,7 +4,7 @@ namespace Contracts;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddContracts(this IServiceCollection services)
+    public static IServiceCollection AddDomain(this IServiceCollection services)
     {
         return services;
 

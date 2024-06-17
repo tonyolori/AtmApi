@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using Authentication.Models;
-using Authentication.Interfaces;
+using Infrastructure.Interfaces;
 using Authentication.Logic;
+using Domain.Models;
 
 namespace AtmApi.Controllers
 {

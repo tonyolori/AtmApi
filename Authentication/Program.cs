@@ -1,7 +1,4 @@
-using Authentication.Data;
-using Authentication.Database;
-using Authentication.Helpers;
-using Authentication.Interfaces;
+using Application.Helpers;
 using Authentication.Logic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -12,6 +9,9 @@ using Application;
 using Infrastructure;
 using Contracts;
 using Serilog;
+using Infrastructure.Database;
+using Infrastructure.Interfaces;
+using Infrastructure.Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,11 +24,10 @@ var jwtKey = builder.Configuration.GetSection("Jwt:Key").Get<string>();
 builder.Services
     .AddApplication()
     .AddInfrastructure()
-    .AddContracts();
+    .AddDomain();
 
 //builder.Host.UseSerilog((context, configuration) =>
 //configuration.ReadFrom.Configuration(context.Configuration));
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  .AddJwtBearer(options =>
@@ -45,20 +44,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
      };
  });
 
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IDataContext, DataContext>();
-builder.Services.AddScoped<UniqueAccountGenerator>();
-builder.Services.AddScoped<TransactionManager>();
-builder.Services.AddScoped(provider =>
-{
-    var configuration = provider.GetRequiredService<IConfiguration>();
-    var userRepository = provider.GetRequiredService<IUserRepository>();
-    return new AuthHelper(configuration, userRepository);
-});
+
 
 builder.Services.AddControllers();
 

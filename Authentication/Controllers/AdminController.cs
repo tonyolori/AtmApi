@@ -1,8 +1,8 @@
 ﻿using AtmApi.ActionFilters;
-using Authentication.Enum;
-using Authentication.Interfaces;
+using Infrastructure.Interfaces;
 using Authentication.Logic;
-using Authentication.Models;
+using Domain.Enum;
+using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -152,7 +152,7 @@ namespace AtmApi.Controllers
         [HttpPost("withdraw")]
         public async Task<IActionResult> Withdraw(long accountNumber, uint amount)
         {
-            User user = await _userRepository.GetUserByAccountNumberAsync(accountNumber);
+            User? user = await _userRepository.GetUserByAccountNumberAsync(accountNumber);
                 
             if(user == null){
                 return NotFound();
@@ -201,7 +201,7 @@ namespace AtmApi.Controllers
 
             try
             {
-                transactionManager.Transfer(sendingUser, ReceivingUser, amount);
+                await transactionManager.Transfer(sendingUser, ReceivingUser, amount);
             }
             catch (Exception ex)
             {
