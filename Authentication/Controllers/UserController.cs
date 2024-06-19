@@ -1,13 +1,12 @@
-﻿using Authentication.ActionFilters;
+﻿using Application.ActionFilters;
 using Application.Helpers;
-using Infrastructure.Interfaces;
-using Authentication.Logic;
 using Domain.Enum;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Application.Interfaces;
 
-namespace Authentication.Controllers
+namespace Application.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -15,10 +14,10 @@ namespace Authentication.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly AuthHelper _authHelper;
-        private readonly UniqueAccountGenerator _uniqueAccountGenerator;
+        private readonly AccountGeneratorHelper _uniqueAccountGenerator;
 
 
-        public UserController(IUserRepository userRepository, AuthHelper authHelper, UniqueAccountGenerator uniqueAccountGenerator)
+        public UserController(IUserRepository userRepository, AuthHelper authHelper, AccountGeneratorHelper uniqueAccountGenerator)
         {
             _userRepository = userRepository;
             _authHelper = authHelper;

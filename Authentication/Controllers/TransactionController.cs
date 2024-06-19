@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using Infrastructure.Interfaces;
-using Authentication.Logic;
+using Application.Interfaces;
+using Application.Helpers;
 using Domain.Models;
 
 namespace AtmApi.Controllers
@@ -12,10 +12,10 @@ namespace AtmApi.Controllers
     [Authorize]
 
     public class TransactionController(IUserRepository userRepository, 
-        TransactionManager transactionManager) : Controller
+        TransactionHelper transactionManager) : Controller
     {
         private readonly IUserRepository _userRepository = userRepository;
-        private readonly TransactionManager _transactionManager = transactionManager;
+        private readonly TransactionHelper _transactionManager = transactionManager;
 
         [HttpGet("balance")]
 

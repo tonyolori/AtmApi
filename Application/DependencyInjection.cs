@@ -1,5 +1,4 @@
-﻿using Authentication.Helpers;
-using Authentication.Logic;
+﻿using Application.Helpers;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,9 +16,8 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(assembly);
 
 
-        ///
-        services.AddScoped<UniqueAccountGenerator>();
-        services.AddScoped<TransactionManager>();
+        services.AddScoped<AccountGeneratorHelper>();
+        services.AddScoped<TransactionHelper>();
         services.AddScoped(provider =>
         {
             var configuration = provider.GetRequiredService<IConfiguration>();

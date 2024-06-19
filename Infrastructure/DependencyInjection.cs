@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Data;
 using Infrastructure.Database;
-using Infrastructure.Interfaces;
+using Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure;

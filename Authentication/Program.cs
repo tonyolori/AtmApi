@@ -1,5 +1,5 @@
 using Application.Helpers;
-using Authentication.Logic;
+using Application.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,8 +9,7 @@ using Application;
 using Infrastructure;
 using Contracts;
 using Serilog;
-using Infrastructure.Database;
-using Infrastructure.Interfaces;
+using Application.Interfaces;
 using Infrastructure.Data;
 
 

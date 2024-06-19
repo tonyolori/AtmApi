@@ -1,10 +1,10 @@
 ﻿using AtmApi.ActionFilters;
-using Infrastructure.Interfaces;
-using Authentication.Logic;
+using Application.Helpers;
 using Domain.Enum;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Application.Interfaces;
 
 namespace AtmApi.Controllers
 {
@@ -12,12 +12,12 @@ namespace AtmApi.Controllers
     [ApiController]
     
     public class AdminController(IUserRepository userRepository,
-        UniqueAccountGenerator uniqueAccountGenerator,
-        TransactionManager transactionManager) : Controller
+        AccountGeneratorHelper uniqueAccountGenerator,
+        TransactionHelper transactionManager) : Controller
     {
-        private readonly UniqueAccountGenerator _uniqueAccountGenerator = uniqueAccountGenerator;
+        private readonly AccountGeneratorHelper _uniqueAccountGenerator = uniqueAccountGenerator;
         private readonly IUserRepository _userRepository = userRepository;
-        private readonly TransactionManager _transactionManager = transactionManager;
+        private readonly TransactionHelper _transactionManager = transactionManager;
 
 
         [HttpPost("create")]

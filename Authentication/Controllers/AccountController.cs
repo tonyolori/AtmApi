@@ -2,8 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Application.Helpers;
-using Authentication.Logic;
-using Infrastructure.Interfaces;
+using Application.Interfaces;
 
 namespace AtmApi.Controllers
 {
@@ -12,11 +11,11 @@ namespace AtmApi.Controllers
     public class AccountController : ControllerBase
     {
         private readonly AuthHelper _authHelper;
-        private readonly UniqueAccountGenerator _uniqueAccountGenerator;
+        private readonly AccountGeneratorHelper _uniqueAccountGenerator;
         private readonly IUserRepository _userRepository;
 
 
-        public AccountController(AuthHelper authHelper, UniqueAccountGenerator uniqueAccountGenerator, IUserRepository userRepository)
+        public AccountController(AuthHelper authHelper, AccountGeneratorHelper uniqueAccountGenerator, IUserRepository userRepository)
         {
             _authHelper = authHelper;
             _uniqueAccountGenerator = uniqueAccountGenerator;
