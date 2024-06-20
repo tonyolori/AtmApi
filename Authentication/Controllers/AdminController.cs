@@ -5,6 +5,8 @@ using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.Interfaces;
+using FluentValidation.Results;
+using Application.Validator;
 
 namespace AtmApi.Controllers
 {
@@ -23,17 +25,17 @@ namespace AtmApi.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateAccount(UserDto account)
         {
-            if(account.FirstName.ToLower().Equals(account.LastName.ToLower()))
-            {
-                return BadRequest("first and last name cannot be the same");
-            }
+            //if(account.FirstName.ToLower().Equals(account.LastName.ToLower()))
+            //{
+            //    return BadRequest("first and last name cannot be the same");
+            //}
             
-            if (account.Pin.ToString().Length != 4)
-            {
-                return BadRequest("invalid pin length");
-            }
+            //if (account.Pin.ToString().Length != 4)
+            //{
+            //    return BadRequest("invalid pin length");
+            //}
 
-            User user = new User
+            User user = new()
             {
                 FirstName = account.FirstName,
                 LastName = account.LastName,
@@ -45,7 +47,14 @@ namespace AtmApi.Controllers
                 Role = UserRole.Admin,
             };
 
+            UserValidator validator = new();
 
+            ValidationResult result = validator.Validate(user);
+
+            if (!result.IsValid)
+            {
+                return BadRequest(GetErrorList(result.Errors));
+            }
             _userRepository.AddUser(user);
 
             return Created("", user);
@@ -108,7 +117,6 @@ namespace AtmApi.Controllers
             }
         }
 
-        ///i stopped here 
         [HttpGet("balance")]
         [Authorize]
         [VerifyAdmin]
@@ -239,6 +247,7 @@ namespace AtmApi.Controllers
 
             return Ok(account);
         }
+
         [VerifyAccountNumberLength]
         [HttpDelete]
         public async Task<ActionResult> DeleteUser(long accountNumber)
@@ -254,6 +263,18 @@ namespace AtmApi.Controllers
 
             return Ok();
         }
+
+        private static List<string> GetErrorList(List<ValidationFailure> errors)
+        {
+            List<string> errorList = [];
+            foreach (ValidationFailure failure in errors)
+            {
+                errorList.Add($"{failure.PropertyName}:{failure.ErrorMessage}");
+            }
+
+            return errorList;
+        }
+
 
     }
 
