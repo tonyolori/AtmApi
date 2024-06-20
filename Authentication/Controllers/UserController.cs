@@ -5,6 +5,8 @@ using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Application.Interfaces;
+using Application.Validator;
+using FluentValidation.Results;
 
 namespace Application.Controllers
 {
@@ -25,18 +27,18 @@ namespace Application.Controllers
         }
 
         [HttpPost("register")]
-        [ValidateEmail]
-        [ValidatePassword]// mediator pattern and fluent validation
+        //[ValidateEmail]
+        //[ValidatePassword]// mediator pattern and fluent validation
         public async Task<ActionResult> Register(UserDto user)
         {
-            if (user.FirstName.ToLower().Equals(user.LastName.ToLower()))
-            {
-                return BadRequest("first and last name cannot be the same");
-            }
-            else if (user.Pin.ToString().Length != 4)
-            {
-                return BadRequest("invalid pin length");
-            }
+            //if (user.FirstName.ToLower().Equals(user.LastName.ToLower()))
+            //{
+            //    return BadRequest("first and last name cannot be the same");
+            //}
+            //else if (user.Pin.ToString().Length != 4)
+            //{
+            //    return BadRequest("invalid pin length");
+            //}
 
             var newUser = new User()
             {
@@ -51,6 +53,15 @@ namespace Application.Controllers
                 Role = UserRole.User,
             };
 
+            UserValidator validator = new();
+
+            ValidationResult result = validator.Validate(newUser);
+
+            if (!result.IsValid)
+            {
+                return BadRequest(GetErrorList(result.Errors));
+            }
+
             User? dbUser = await _userRepository.GetUserByEmailAsync(user.Email);
 
             if (dbUser != null)
@@ -64,6 +75,16 @@ namespace Application.Controllers
             return Ok(newUser);
         }
 
+        private static List<string> GetErrorList(List<ValidationFailure> errors)
+        {
+            List<string> errorList = [];
+            foreach(ValidationFailure failure in errors) 
+            {
+                errorList.Add($"{failure.PropertyName}:{failure.ErrorMessage}");
+            }
+
+            return errorList;
+        }
 
         [HttpPost("login")]
         [ValidateEmail]
