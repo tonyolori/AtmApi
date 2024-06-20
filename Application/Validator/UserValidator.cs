@@ -27,14 +27,7 @@ namespace Application.Validator
 
             RuleFor(user => user.Email)
                 .NotEmpty().WithMessage("Email cannot be empty")
-                .Custom((email, context) =>
-                {
-                    if (!IsValidEmail(email))
-                    {
-                        context.AddFailure("Invalid Email format");
-                    }
-                }
-                );
+                .Must(BeValidEmail).WithMessage("Invalid {PropertyName} format");
             
 
             RuleFor(user => user.Pin)
@@ -46,9 +39,9 @@ namespace Application.Validator
                 .NotEmpty()
                 .Must(Password => Password.Length >= 8)
                 .WithMessage("Password must be at least 8 characters long.")
-                .Must(password => !password.Any(char.IsDigit))
+                .Must(password => password.Any(char.IsDigit))
                 .WithMessage("Password must contain at least one digit.")
-                .Must(password => !password.Any(IsSpecialCharacter))
+                .Must(password => password.Any(IsSpecialCharacter))
                 .WithMessage("Password must contain at least one special character.");
 
 
@@ -63,7 +56,7 @@ namespace Application.Validator
                 });
 
         }
-        private static bool IsValidEmail(string email)
+        private static bool BeValidEmail(string email)
         {
             // Regular expression pattern for "_@." format
             string pattern = @"^[\w-]+@[\w-]+\.[\w.]+$";
