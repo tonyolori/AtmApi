@@ -27,19 +27,8 @@ namespace Application.Controllers
         }
 
         [HttpPost("register")]
-        //[ValidateEmail]
-        //[ValidatePassword]// mediator pattern and fluent validation
         public async Task<ActionResult> Register(UserDto user)
         {
-            //if (user.FirstName.ToLower().Equals(user.LastName.ToLower()))
-            //{
-            //    return BadRequest("first and last name cannot be the same");
-            //}
-            //else if (user.Pin.ToString().Length != 4)
-            //{
-            //    return BadRequest("invalid pin length");
-            //}
-
             var newUser = new User()
             {
 
@@ -75,17 +64,6 @@ namespace Application.Controllers
             return Ok(newUser);
         }
 
-        private static List<string> GetErrorList(List<ValidationFailure> errors)
-        {
-            List<string> errorList = [];
-            foreach(ValidationFailure failure in errors) 
-            {
-                errorList.Add($"{failure.PropertyName}:{failure.ErrorMessage}");
-            }
-
-            return errorList;
-        }
-
         [HttpPost("login")]
         [ValidateEmail]
         [ValidatePassword]
@@ -111,18 +89,8 @@ namespace Application.Controllers
         }
 
         [HttpPut]
-        [ValidateEmail]
-        [ValidatePassword]
         public async Task<ActionResult<User>> UpdateUser(UserDto user)
         {
-            if (user.FirstName.ToLower().Equals(user.LastName.ToLower()))
-            {
-                return BadRequest("first and last name cannot be the same");
-            }
-            else if (user.Pin.ToString().Length != 4)
-            {
-                return BadRequest("invalid pin length");
-            }
             var dbUser = await _userRepository.GetUserByEmailAsync(user.Email);
 
             if (dbUser == null)
@@ -131,8 +99,16 @@ namespace Application.Controllers
             }
             dbUser.FirstName = user.FirstName;
             dbUser.LastName = user.LastName;
-            dbUser.Email = user.Email;
             dbUser.Password = user.Password;
+
+            UserValidator validator = new();
+
+            ValidationResult result = validator.Validate(dbUser);
+
+            if (!result.IsValid)
+            {
+                return BadRequest(GetErrorList(result.Errors));
+            }
 
             _userRepository.UpdateUserAsync(dbUser);
 
@@ -160,6 +136,17 @@ namespace Application.Controllers
             _userRepository.DeleteUser(dbUser);
 
             return Ok();
+        }
+
+        private static List<string> GetErrorList(List<ValidationFailure> errors)
+        {
+            List<string> errorList = [];
+            foreach (ValidationFailure failure in errors)
+            {
+                errorList.Add($"{failure.PropertyName}:{failure.ErrorMessage}");
+            }
+
+            return errorList;
         }
     }
 }
