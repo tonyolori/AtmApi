@@ -1,5 +1,3 @@
-using Application.Helpers;
-using Application.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,9 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Application;
 using Infrastructure;
-using Contracts;
-using Serilog;
-using Application.Interfaces;
 using Infrastructure.Data;
 
 
@@ -22,8 +17,7 @@ var jwtKey = builder.Configuration.GetSection("Jwt:Key").Get<string>();
 //clean code stuff here 
 builder.Services
     .AddApplication()
-    .AddInfrastructure()
-    .AddDomain();
+    .AddInfrastructure();
 
 //builder.Host.UseSerilog((context, configuration) =>
 //configuration.ReadFrom.Configuration(context.Configuration));
@@ -46,6 +40,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+
+
+// Register MediatR
+//builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
+
 
 
 
@@ -87,11 +87,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddDbContext<DataContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
  
+//builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

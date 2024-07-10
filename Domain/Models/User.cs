@@ -1,5 +1,4 @@
 ﻿using Domain.Enum;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models

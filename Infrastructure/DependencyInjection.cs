@@ -1,5 +1,4 @@
 ﻿using Infrastructure.Data;
-using Infrastructure.Database;
 using Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,9 +9,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
 
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IDataContext, DataContext>();
-
+        services.AddScoped<IDataContext, ApplicationDbContext>();
 
         return services;
 

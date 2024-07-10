@@ -1,67 +1,35 @@
 ﻿using Application.ActionFilters;
-using Application.Helpers;
 using Domain.Enum;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Application.Interfaces;
-using Application.Validator;
-using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
+using MediatR;
+using Application.Users.Commands;
+using Application.Common.Models;
+
 
 namespace Application.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController(IMediator mediator) : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
-        private readonly AuthHelper _authHelper;
-        private readonly AccountGeneratorHelper _uniqueAccountGenerator;
-
-
-        public UserController(IUserRepository userRepository, AuthHelper authHelper, AccountGeneratorHelper uniqueAccountGenerator)
-        {
-            _userRepository = userRepository;
-            _authHelper = authHelper;
-            _uniqueAccountGenerator = uniqueAccountGenerator;
-        }
+        private readonly IMediator _mediator = mediator;
 
         [HttpPost("register")]
         public async Task<ActionResult> Register(UserDto user)
         {
-            var newUser = new User()
+            try
             {
-
-                AccountNumber = await _uniqueAccountGenerator.GenerateUniqueAccount(),
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                Password = user.Password,
-                Pin = user.Pin,
-                Balance = 0,
-                Role = UserRole.User,
-            };
-
-            UserValidator validator = new();
-
-            ValidationResult result = validator.Validate(newUser);
-
-            if (!result.IsValid)
-            {
-                return BadRequest(GetErrorList(result.Errors));
+                var AddUserCommand = new AddUserCommand(user, UserRole.User);
+                Result result = await _mediator.Send(AddUserCommand);
+                return Ok(result);
             }
-
-            User? dbUser = await _userRepository.GetUserByEmailAsync(user.Email);
-
-            if (dbUser != null)
+            catch (Exception ex)
             {
-                return BadRequest("User already Exists");
+                return StatusCode(500, ex.Message);
             }
-
-            _userRepository.AddUser(newUser);
-
-
-            return Ok(newUser);
         }
 
         [HttpPost("login")]
@@ -69,84 +37,51 @@ namespace Application.Controllers
         [ValidatePassword]
         public async Task<ActionResult> Login(string Email, string Password)
         {
-            //verify user exists
-            bool validateInfo = await _userRepository.ValidateCredentials(Email, Password);
-
-            if (!validateInfo)
+            try
             {
-                return BadRequest("invalid email or password");
+                var LoginCommand = new LoginCommand(Email, Password);
+                Result result = await _mediator.Send(LoginCommand);
+                return Ok(result);
             }
-
-            User? user = await _userRepository.GetUserByEmailAsync(Email);
-            if (user == null)
+            catch (Exception ex)
             {
-                return BadRequest("User does not exist");
+                return StatusCode(500, ex.Message);
             }
-
-            var token = _authHelper.GenerateJWTToken(user);
-
-            return Ok(token);
         }
 
         [HttpPut]
-        public async Task<ActionResult<User>> UpdateUser(UserDto user)
+        [Authorize]
+        public async Task<ActionResult> UpdateUser(UserDto user)
         {
-            var dbUser = await _userRepository.GetUserByEmailAsync(user.Email);
-
-            if (dbUser == null)
-            {
-                return NotFound();
-            }
-            dbUser.FirstName = user.FirstName;
-            dbUser.LastName = user.LastName;
-            dbUser.Password = user.Password;
-
-            UserValidator validator = new();
-
-            ValidationResult result = validator.Validate(dbUser);
-
-            if (!result.IsValid)
-            {
-                return BadRequest(GetErrorList(result.Errors));
-            }
-
-            _userRepository.UpdateUserAsync(dbUser);
-
-            return Ok(dbUser);
-        }
-
-
-        [HttpDelete]
-        public async Task<ActionResult> DeleteUser()
-        {
-            string accountNumber = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            User dbUser;
             try
             {
-                dbUser = await _userRepository.GetUserByAccountNumberAsync(long.Parse(accountNumber));
-                if (dbUser == null)
-                {
-                    return NotFound();
-                }
+                var changeUserNameAndPasswordCommand = new ChangeUserNameAndPasswordCommand(user);
+                Result result = await _mediator.Send(changeUserNameAndPasswordCommand);
+                return Ok(result);
             }
-            catch
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, ex.Message);
             }
-            _userRepository.DeleteUser(dbUser);
-
-            return Ok();
         }
 
-        private static List<string> GetErrorList(List<ValidationFailure> errors)
+        [HttpDelete]
+        [Authorize]
+        public async Task<ActionResult> DeleteUser()
         {
-            List<string> errorList = [];
-            foreach (ValidationFailure failure in errors)
+            try
             {
-                errorList.Add($"{failure.PropertyName}:{failure.ErrorMessage}");
+                long accountNumber = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                var DeleteUserCommand = new DeleteUserCommand(accountNumber);
+                Result result = await _mediator.Send(DeleteUserCommand);
+                return Ok(result);
             }
-
-            return errorList;
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
+
     }
+
 }

@@ -1,7 +1,7 @@
 ﻿
 using Domain.Models;
 
-namespace Domain.Logic
+namespace Application.Helpers
 {
     public static class UserExtensions
     {
@@ -19,21 +19,25 @@ namespace Domain.Logic
             return user.Balance;
         }
 
-        public static void Withdraw(this User user, uint amount)
+        public static bool Withdraw(this User user, uint amount)
         {
             if (user.Balance - amount >= 0)
             {
                 user.Balance -= amount;
+                return true;
             }
-            else
-            {
-                throw new InvalidOperationException("Insufficient funds");
-            }
+            return false;
         }
 
         public static void Deposit(this User user, uint amount)
         {
             user.Balance += amount;
+            return;
+        }
+
+        public static void ChangePin(this User user, int newPin)
+        {
+            user.Pin = newPin;
             return;
         }
     }

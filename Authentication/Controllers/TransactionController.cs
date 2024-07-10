@@ -1,189 +1,296 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using Application.Interfaces;
-using Application.Helpers;
-using Domain.Models;
+using MediatR;
+using Application.UserTransactions.Queries;
+using Application.UserTransactions.Commands;
+using Application.Common.Models;
 
-namespace AtmApi.Controllers
+namespace Api.Controllers
 {
     [Route("api/")]
     [ApiController]
     [Authorize]
-
-    public class TransactionController(IUserRepository userRepository, 
-        TransactionHelper transactionManager) : Controller
+    public class TransactionController(IMediator mediator) : ControllerBase
     {
-        private readonly IUserRepository _userRepository = userRepository;
-        private readonly TransactionHelper _transactionManager = transactionManager;
+        private readonly IMediator _mediator = mediator;
 
         [HttpGet("balance")]
-
-        public async Task <IActionResult> GetBalance()
+        public async Task<IActionResult> GetBalance()
         {
-            string accountNumber = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            User? user;
             try
             {
-                user = await _userRepository.GetUserByAccountNumberAsync(long.Parse(accountNumber));
-                if (user == null) 
-                {
-                    return NotFound();
-                }
+                long accountNumber = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                Result result = await _mediator.Send(new GetBalanceQuery(accountNumber));
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
 
-            return base.Ok(user.GetBalance());//pass back a balancxe response or text
         }
 
         [HttpPost("deposit")]
         public async Task<IActionResult> Deposit(uint amount, int pin)
         {
-            string accountNumber = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            User user;
             try
             {
-                user = await _userRepository.GetUserByAccountNumberAsync(long.Parse(accountNumber));
-
-                if (user == null)
-                {
-                    return NotFound();
-                }
-
-                if (!user.MatchPin(pin)){
-                    return BadRequest("Invalid Pin");
-                }
-
-
-                user.Deposit(amount);
-                _userRepository.UpdateUserAsync(user);
+                long accountNumber = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                Result result = await _mediator.Send(new DepositCommand(accountNumber, amount));
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
-
-            return Ok();
         }
 
         [HttpPost("withdraw")]
         public async Task<IActionResult> Withdraw(uint amount, int pin)
         {
-            string accountNumber = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            User user;
             try
             {
-                user = await _userRepository.GetUserByAccountNumberAsync(long.Parse(accountNumber));
-
-                if (user == null)
-                {
-                    return NotFound();
-                }
-                else if (!user.MatchPin(pin))
-                {
-                    return BadRequest("Invalid Pin");
-                }
-
-                user.Withdraw(amount);
-                _userRepository.UpdateUserAsync(user);
-
+            long accountNumber = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            Result result = await _mediator.Send(new WithdrawCommand(accountNumber, amount));
+            return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
-
-            return Ok();
         }
 
         [HttpPost("transfer")]
-        public async Task <IActionResult> Transfer(long receivingAccount, uint amount, int pin)
+        public async Task<IActionResult> Transfer(long receivingAccount, uint amount, int pin)
         {
-            string senderAccount = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            User? sendingUser;
-            User? ReceivingUser;
             try
             {
-
-                sendingUser = await _userRepository.GetUserByAccountNumberAsync(long.Parse(senderAccount));
-                if (sendingUser == null)
-                {
-                    return NotFound();
-                }
-                else if (!sendingUser.MatchPin(pin))
-                {
-                    return BadRequest("Invalid Pin");
-                }
-
-            }
-            catch
-            {
-                return BadRequest("Invalid sending user");
-            }
-
-            try
-            {
-                ReceivingUser = await _userRepository.GetUserByAccountNumberAsync(receivingAccount);
-                if (ReceivingUser == null)
-                {
-                    return NotFound();
-                }
-            }
-            catch
-            {
-                return BadRequest("Invalid Receiving user");
-            }
-
-
-            try
-            {
-                _transactionManager.Transfer(sendingUser, ReceivingUser, amount);
+            long accountNumber = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var result = await _mediator.Send(new TransferCommand(accountNumber, receivingAccount, amount, pin));
+            return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
-
-            return Ok();
         }
 
         [HttpPost("changePin")]
-        public async Task<ActionResult<User>> ChangePin(int pin)
+        public async Task<IActionResult> ChangePin(int pin)
         {
-            //// Extract the account number from the token.
-            var uAccountNumber = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            User? user;
-
             try
             {
-                 user = await _userRepository.GetUserByAccountNumberAsync(long.Parse(uAccountNumber));
-
-                if(user == null)
-                {
-                    return NotFound();
-                }
-
-                if (user.MatchPin(pin))
-                {
-                    return BadRequest("Pin cannot be the same as old pin");
-                }
-
-               _transactionManager.ChangePin(user, pin);
+            long accountNumber = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            Result result = await _mediator.Send(new ChangePinCommand(accountNumber, pin));
+            return Ok(result);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return BadRequest(e.Message);
-
+                return StatusCode(500, ex.Message);
             }
-
-            return Ok(user);
         }
-
-
-
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//namespace AtmApi.Controllers
+//{
+//    [Route("api/")]
+//    [ApiController]
+//    [Authorize]
+
+//    public class TransactionController(IUserRepository userRepository,
+//        TransactionHelper transactionManager, ITransactionRepository transactionRepository) : Controller
+//    {
+//        private readonly IUserRepository _userRepository = userRepository;
+//        private readonly ITransactionRepository _transactionRepository = transactionRepository;
+//        private readonly TransactionHelper _transactionManager = transactionManager;
+
+//        [HttpGet("balance")]
+
+//        public async Task<IActionResult> GetBalance()
+//        {
+//            User? user;
+//            long accountNumber;
+//            try
+//            {
+//                accountNumber = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+//                user = await _userRepository.GetUserByAccountNumberAsync(accountNumber);
+//                if (user == null)
+//                {
+//                    return NotFound();
+//                }
+//            }
+//            catch (Exception ex)
+//            {
+//                return BadRequest(ex.Message);
+//            }
+
+//            long balance = user.GetBalance();
+
+//            var transaction = TransactionType.BalanceQuery.CreateTransaction(accountNumber, balance, true);
+//            await _transactionRepository.AddTransaction(transaction);
+
+//            return Ok(balance);//pass back a balance response or text
+//        }
+
+//        [HttpPost("deposit")]
+//        public async Task<IActionResult> Deposit(uint amount, int pin)
+//        {
+//            User? user;
+//            long accountNumber;
+//            try
+//            {
+//                accountNumber = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+//                user = await _userRepository.GetUserByAccountNumberAsync(accountNumber);
+
+
+//                if (user == null)
+//                {
+//                    return NotFound();
+//                }
+
+//                if (!user.MatchPin(pin))
+//                {
+//                    return BadRequest("Invalid Pin");
+//                }
+
+
+//                user.Deposit(amount);
+//                _userRepository.UpdateUserAsync(user);
+//            }
+//            catch (Exception ex)
+//            {
+//                return BadRequest(ex.Message);
+//            }
+
+
+//            var transaction = TransactionType.Deposit.CreateTransaction(accountNumber, amount, true);
+//            await _transactionRepository.AddTransaction(transaction);
+//            return Ok();
+//        }
+
+//        [HttpPost("withdraw")]
+//        public async Task<IActionResult> Withdraw(uint amount, int pin)
+//        {
+
+//            User? user;
+//            try
+//            {
+//                long accountNumber = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+//                user = await _userRepository.GetUserByAccountNumberAsync(accountNumber);
+//                if (user == null)
+//                {
+//                    return NotFound();
+//                }
+//                else if (!user.MatchPin(pin))
+//                {
+//                    return BadRequest("Invalid Pin");
+//                }
+
+//                user.Withdraw(amount);
+//                var transaction = TransactionType.Withdrawal.CreateTransaction(accountNumber, amount, true);
+//                await _transactionRepository.AddTransaction(transaction);
+//                _userRepository.UpdateUserAsync(user);
+
+//            }
+//            catch (Exception ex)
+//            {
+//                return BadRequest(ex.Message);
+//            }
+
+//            return Ok();
+//        }
+
+//        [HttpPost("transfer")]
+//        public async Task<IActionResult> Transfer(long receivingAccount, uint amount, int pin)
+//        {
+
+//            bool _ = long.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out long accountNumber);
+
+//            User? sendingUser = await _userRepository.GetUserByAccountNumberAsync(accountNumber);
+
+//            if (sendingUser == null || !sendingUser.MatchPin(pin))
+//            {
+//                return BadRequest("Invalid sending user or Invalid Pin");
+//            }
+//            if (sendingUser.AccountNumber == receivingAccount)
+//            {
+//                return BadRequest("Cannot Transfer to the same account");
+//            }
+
+
+
+//            User? ReceivingUser = await _userRepository.GetUserByAccountNumberAsync(receivingAccount);
+//            if (ReceivingUser == null)
+//            {
+//                return BadRequest("Invalid Receiving user");
+//            }
+
+//            if (_transactionManager.Transfer(sendingUser, ReceivingUser, amount))
+//            {
+//                var transaction = TransactionType.Deposit.CreateTransaction(accountNumber, amount, true);
+//                await _transactionRepository.AddTransaction(transaction);
+//                return Ok(CustomResponseMessage.Sucess("Transfer"));
+//            }
+//            else
+//            {
+//                return BadRequest();
+//            }
+
+//        }
+
+//        [HttpPost("changePin")]
+//        public async Task<ActionResult<User>> ChangePin(int pin)
+//        {
+
+//            User? user;
+
+//            try
+//            {
+//                long uAccountNumber = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+//                user = await _userRepository.GetUserByAccountNumberAsync(uAccountNumber);
+//                if (user == null)
+//                {
+//                    return NotFound();
+//                }
+
+//                if (user.MatchPin(pin))
+//                {
+//                    return BadRequest("Pin cannot be the same as old pin");
+//                }
+
+//                _transactionManager.ChangePin(user, pin);
+//            }
+//            catch (Exception e)
+//            {
+//                return BadRequest(e.Message);
+
+//            }
+
+//            return Ok(user);
+//        }
+
+
+
+//    }
+//}

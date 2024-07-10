@@ -18,7 +18,5 @@ namespace Application.Interfaces
         Task<bool> DoesUserIdExistAsync(long accountNumber);
         Task<List<long>> GetAllAdminsAsync();
 
-        Task<bool> ValidateCredentials(string Email, string Password);
-
     }
 }

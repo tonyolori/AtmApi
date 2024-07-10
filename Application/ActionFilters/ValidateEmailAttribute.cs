@@ -21,7 +21,7 @@ namespace Application.ActionFilters
                 User? user = context.ActionArguments["user"] as User; // Replace with your actual user type
                 if (user != null)
                 {
-                    ValidateEmail(user.Password, context);
+                    ValidateEmail(user.Email, context);
                 }
             }
             else
@@ -30,8 +30,6 @@ namespace Application.ActionFilters
                 context.Result = new BadRequestObjectResult("Email address not provided.");
             }
 
-
-            base.OnActionExecuting(context);
         }
 
         private static void ValidateEmail(string? email, ActionExecutingContext context)

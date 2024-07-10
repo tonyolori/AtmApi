@@ -1,100 +1,85 @@
-﻿using Domain.Enum;
-using Domain.Models;
-using Application.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿//using Domain.Enum;
+//using Domain.Models;
+//using Application.Interfaces;
+//using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Database
-{
-    public class UserRepository : IUserRepository
-    {
-        private readonly IDataContext _context;
+//namespace Infrastructure.Database
+//{
+//    public class UserRepository : IUserRepository
+//    {
+//        private readonly IDataContext _context;
 
-        public UserRepository(IDataContext context)
-        {
-            _context = context;
-        }
+//        public UserRepository(IDataContext context)
+//        {
+//            _context = context;
+//        }
 
-        public async Task<List<User>> GetUsersAsync()
-        {
-            List<User> users = await _context.Users.ToListAsync();
+//        public async Task<List<User>> GetUsersAsync()
+//        {
+//            List<User> users = await _context.Users.ToListAsync();
 
-            return users;
-        }
-        public async Task<User?> GetUserAsync(int id)
-        {
-            User? user = await _context.Users.FindAsync(id);
+//            return users;
+//        }
+//        public async Task<User?> GetUserAsync(int id)
+//        {
+//            User? user = await _context.Users.FindAsync(id);
 
-            return user;
-        }
+//            return user;
+//        }
 
-        public async Task<User> GetUserByEmailAsync(string email)
-        {
-            return await _context.Users
-                    .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
-        }
-        public async Task<User?> GetUserByAccountNumberAsync(long accountNumber)
-        {
-            User? user = await _context.Users
-                    .FirstOrDefaultAsync(u => u.AccountNumber == accountNumber);
+//        public async Task<User> GetUserByEmailAsync(string email)
+//        {
+//            return await _context.Users
+//                    .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+//        }
+//        public async Task<User?> GetUserByAccountNumberAsync(long accountNumber)
+//        {
+//            User? user = await _context.Users
+//                    .FirstOrDefaultAsync(u => u.AccountNumber == accountNumber);
 
-            return user;
-        }
-
-
-        public async Task<List<long>> GetAllAdminsAsync()
-        {
-            var users = await GetUsersAsync();
-            var admins = users.Where(u => u.Role == UserRole.Admin);
-            List<long> adminsAccountNumbers = admins.Select(u => u.AccountNumber).ToList();
-
-            return adminsAccountNumbers;
-        }
-
-        public void AddUser(User user)
-        {
-            _context.Users.Add(user);
-            _context.SaveChanges();
-        }
-
-        public void UpdateUserAsync(User user)
-        {
-            _context.Users.Update(user);
-            _context.SaveChanges();
-
-        }
-
-        public void DeleteUser(User user)
-        {
-            _context.Users.Remove(user);
-            _context.SaveChanges();
-
-        }
-
-        public async void SaveChanges()
-        {
-            await _context.SaveChangesAsync();
-
-        }
-
-        public async Task<bool> DoesUserIdExistAsync(long accountNumber)
-        {
-            return await _context.Users.AnyAsync(u => u.AccountNumber == accountNumber);
-        }
-
-        public async Task<bool> ValidateCredentials(string Email, string Password)
-        {
+//            return user;
+//        }
 
 
-            var storedUser = await GetUserByEmailAsync(Email);
+//        public async Task<List<long>> GetAllAdminsAsync()
+//        {
+//            var users = await GetUsersAsync();
+//            var admins = users.Where(u => u.Role == UserRole.Admin);
+//            List<long> adminsAccountNumbers = admins.Select(u => u.AccountNumber).ToList();
 
-            if (storedUser == null)
-            {
-                return false;
-            }
+//            return adminsAccountNumbers;
+//        }
 
-            return Password == storedUser.Password;
-        }
+//        public void AddUser(User user)
+//        {
+//            _context.Users.Add(user);
+//            _context.SaveChanges();
+//        }
 
+//        public void UpdateUserAsync(User user)
+//        {
+//            _context.Users.Update(user);
+//            _context.SaveChanges();
 
-    }
-}
+//        }
+
+//        public void DeleteUser(User user)
+//        {
+//            _context.Users.Remove(user);
+//            _context.SaveChanges();
+
+//        }
+
+//        public async void SaveChanges()
+//        {
+//            await _context.SaveChangesAsync();
+
+//        }
+
+//        public async Task<bool> DoesUserIdExistAsync(long accountNumber)
+//        {
+//            return await _context.Users.AnyAsync(u => u.AccountNumber == accountNumber);
+//        }
+
+//    }
+//}

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace AtmApi.ActionFilters
 {
@@ -18,7 +17,7 @@ namespace AtmApi.ActionFilters
                 return;
             }
 
-            base.OnActionExecuting(context);
+            OnActionExecuting(context);
         }
     }
 }

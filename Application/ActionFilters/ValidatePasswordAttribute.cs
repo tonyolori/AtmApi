@@ -1,8 +1,6 @@
 ﻿using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System;
-using System.Linq;
 
 namespace Application.ActionFilters
 {
@@ -19,7 +17,7 @@ namespace Application.ActionFilters
             else if (context.ActionArguments.ContainsKey("user"))
             {
                 // Check for password within user object
-                UserDto? user = context.ActionArguments["user"] as UserDto; // Replace with your actual user type
+                User? user = context.ActionArguments["user"] as User; // Replace with your actual user type
                 if (user != null)
                 {
                     ValidatePassword(user.Password,context);
@@ -36,7 +34,7 @@ namespace Application.ActionFilters
                 context.Result = new BadRequestObjectResult("Password not provided.");
             }
 
-            base.OnActionExecuting(context);
+            //OnActionExecuting(context);
         }
 
         private void ValidatePassword(string password, ActionExecutingContext context )
@@ -117,7 +115,7 @@ namespace Application.ActionFilters
 //                return;
 //            }
 
-//            base.OnActionExecuting(context);
+//            OnActionExecuting(context);
 //        }
 
 //        private bool IsSpecialCharacter(char c)

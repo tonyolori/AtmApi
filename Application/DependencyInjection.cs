@@ -15,9 +15,6 @@ public static class DependencyInjection
         
         services.AddValidatorsFromAssembly(assembly);
 
-
-        services.AddScoped<AccountGeneratorHelper>();
-        services.AddScoped<TransactionHelper>();
         services.AddScoped(provider =>
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
