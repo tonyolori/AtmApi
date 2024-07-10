@@ -1,5 +1,4 @@
-﻿using Application.ActionFilters;
-using Domain.Enum;
+﻿using Domain.Enum;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using MediatR;
 using Application.Users.Commands;
 using Application.Common.Models;
+using Application.Common.DTOs;
 
 
 namespace Application.Controllers
@@ -33,13 +33,11 @@ namespace Application.Controllers
         }
 
         [HttpPost("login")]
-        [ValidateEmail]
-        [ValidatePassword]
-        public async Task<ActionResult> Login(string Email, string Password)
+        public async Task<ActionResult> Login(LoginDto loginDto)
         {
             try
             {
-                var LoginCommand = new LoginCommand(Email, Password);
+                var LoginCommand = new LoginCommand(loginDto);
                 Result result = await _mediator.Send(LoginCommand);
                 return Ok(result);
             }

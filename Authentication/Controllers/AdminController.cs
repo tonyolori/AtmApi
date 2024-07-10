@@ -7,11 +7,10 @@ using Application.UserTransactions.Commands;
 using Application.Common.Models;
 using Application.UserTransactions.Queries;
 using Application.Users.Commands;
-using AtmApi.ActionFilters;
 
 namespace AtmApi.Controllers;
 
-[VerifyAdmin]
+//[VerifyAdmin]
 [Route("api/[controller]")]
 [ApiController]
 public class AdminController(IMediator mediator) : ControllerBase

@@ -16,9 +16,10 @@ public class AddUserCommand(UserDto user, UserRole role) : IRequest<Result>
     public UserRole UserRole { get; set; } = role;
 }
 
-public class AddUserCommandHandler(IDataContext context) : IRequestHandler<AddUserCommand, Result>
+public class AddUserCommandHandler(IDataContext context, ISecretHasher secretHasher) : IRequestHandler<AddUserCommand, Result>
 {
     private readonly IDataContext _context = context;
+    private readonly ISecretHasher _secretHasher = secretHasher;
 
     public async Task<Result> Handle(AddUserCommand request, CancellationToken cancellationToken)
     {
@@ -50,7 +51,7 @@ public class AddUserCommandHandler(IDataContext context) : IRequestHandler<AddUs
             Email = request.User.Email,
             Balance = 0,
             Pin = request.User.Pin,
-            Password = request.User.Password,
+            Password = _secretHasher.Hash(request.User.Password),
             Role = request.UserRole,
         };
 

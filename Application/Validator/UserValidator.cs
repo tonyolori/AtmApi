@@ -4,13 +4,13 @@ using System.Text.RegularExpressions;
 
 namespace Application.Validator
 {
-    public class UserValidator :AbstractValidator<UserDto>
+    public class UserValidator : AbstractValidator<UserDto>
     {
         public UserValidator()
         {
             RuleFor(user => user)
                 .NotEmpty()
-                .Custom((user, context) => 
+                .Custom((user, context) =>
                 {
                     if (user.FirstName.ToLower().Equals(user.LastName.ToLower()))
                     {
@@ -27,7 +27,7 @@ namespace Application.Validator
             RuleFor(user => user.Email)
                 .NotEmpty().WithMessage("Email cannot be empty.")
                 .EmailAddress().WithMessage("Invalid {PropertyName} format.");
-            
+
 
             RuleFor(user => user.Pin)
                 .NotEmpty()
@@ -43,8 +43,8 @@ namespace Application.Validator
 
         private static bool BeValidPassword(string password)
         {
-            string pattern = @"^(?=.*\\d)(?=.*[\\W_])(?=.*[a-zA-Z]).{8,}$";
-
+            string pattern = @"^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$";
+            //string pattern = @"^(?=.*\\d)(?=.*[\\W_])(?=.*[a-zA-Z]).{8,}$";
 
             Regex regex = new Regex(pattern);
 

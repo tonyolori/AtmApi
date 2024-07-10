@@ -1,6 +1,4 @@
-﻿using Application.Helpers;
-using FluentValidation;
-using Microsoft.Extensions.Configuration;
+﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -15,11 +13,12 @@ public static class DependencyInjection
         
         services.AddValidatorsFromAssembly(assembly);
 
-        services.AddScoped(provider =>
-        {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            return new AuthHelper(configuration);
-        });
+        //services.AddScoped(provider =>
+        //{
+        //    var configuration = provider.GetRequiredService<IConfiguration>();
+        //    return new AuthHelper(configuration);
+        //});
+
         return services;
     
     }

@@ -2,27 +2,41 @@
 using Domain.Models;
 using Application.Interfaces;
 using Application.Common.Models;
-using Application.Helpers;
 using Application.Users.Queries;
+using Application.Common.DTOs;
+using Application.Common;
+using Application.Validator;
+using FluentValidation.Results;
 
 namespace Application.Users.Commands
 {
-    public class LoginCommand(string email, string password) : IRequest<Result>
+    public class LoginCommand(LoginDto loginDto) : IRequest<Result>
     {
-        public string Email { get; set; } = email;
-        public string Password { get; set; } = password;
-
+        public LoginDto LoginDto = loginDto;
     }
 
-    public class LoginCommandHandler(IDataContext context,AuthHelper authHelper) : IRequestHandler<LoginCommand, Result>
+    public class LoginCommandHandler(IDataContext context,IAuthHelper authHelper, ISecretHasher secretHasher) : IRequestHandler<LoginCommand, Result>
     {
         private readonly IDataContext _context = context;
-        private readonly AuthHelper _authHelper = authHelper;
+        private readonly IAuthHelper _authHelper = authHelper;
+        private readonly ISecretHasher _secretHasher = secretHasher;
 
         public async Task<Result> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            var GetUserByEmailQuery = new GetUserByEmailQuery(request.Email);
-            var result = await new GetUserByEmailQueryHandler(context).Handle(GetUserByEmailQuery, cancellationToken);
+            // Validate input (same as before)
+            LoginValidator validator = new();
+            ValidationResult valResult = validator.Validate(request.LoginDto);
+
+            if (!valResult.IsValid)
+            {
+                string errors = string.Join("\n", Utils.GetPrintableErrorList(valResult.Errors));
+                return Result.Failure<string>(errors);
+            }
+
+
+            var GetUserByEmailQuery = new GetUserByEmailQuery(request.LoginDto.Email);
+            Result result = await new GetUserByEmailQueryHandler(_context).Handle(GetUserByEmailQuery, cancellationToken);
+            
             User? storedUser = (User?)result.Entity;
 
             if (storedUser == null)
@@ -30,7 +44,7 @@ namespace Application.Users.Commands
                 return Result.Failure<string>("User does not exist");
             }
 
-            if(request.Password == storedUser.Password)
+            if(_secretHasher.Verify(request.LoginDto.Password,storedUser.Password))
             {
                 var token = _authHelper.GenerateJWTToken(storedUser);
                 return Result.Success<string>(token);

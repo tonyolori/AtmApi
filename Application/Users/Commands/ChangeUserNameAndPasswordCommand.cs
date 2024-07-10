@@ -14,10 +14,10 @@ namespace Application.Users.Commands
         public UserDto User { get; set; } = user;
     }
 
-    public class ChangeUserNameAndPasswordCommandHandler(IDataContext context) : IRequestHandler<ChangeUserNameAndPasswordCommand, Result>
+    public class ChangeUserNameAndPasswordCommandHandler(IDataContext context,ISecretHasher secretHasher) : IRequestHandler<ChangeUserNameAndPasswordCommand, Result>
     {
         private readonly IDataContext _context = context;
-
+        private readonly ISecretHasher _secretHasher = secretHasher;
         public async Task<Result> Handle(ChangeUserNameAndPasswordCommand request, CancellationToken cancellationToken)
         {
             UserValidator validator = new();
@@ -37,9 +37,16 @@ namespace Application.Users.Commands
                 return Result.Failure<string>("user not found");
             }
 
+            string newPassword = _secretHasher.Hash(request.User.Password);
+            if(newPassword == dbUser.Password)
+            {
+                return Result.Failure<string>("New password cannot be the same as old password");
+            }
+            
             dbUser.FirstName = request.User.FirstName;
             dbUser.LastName = request.User.LastName;
             dbUser.Password = request.User.Password;
+
 
             var UpdateUserCommand = new UpdateUserCommand(dbUser);
             await new UpdateUserCommandHandler(context).Handle(UpdateUserCommand, cancellationToken);
