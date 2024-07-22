@@ -24,7 +24,7 @@ namespace Application.Transactions.Commands
             await _context.SaveChangesAsync(cancellationToken);
 
 
-            return CustomResponseMessage.Success("Transaction created");
+            return "Transaction created";
         }
 
 

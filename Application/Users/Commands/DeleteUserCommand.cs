@@ -28,7 +28,7 @@ namespace Application.Users.Commands
             _context.Users.Remove(user);
             _context.SaveChanges();
 
-            return Result.Success("User Deleted");
+            return Result.Success<string>("User Deleted");
         }
 
     }

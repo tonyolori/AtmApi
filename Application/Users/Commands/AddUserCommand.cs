@@ -16,11 +16,11 @@ public class AddUserCommand(UserDto user, UserRole role) : IRequest<Result>
     public UserRole UserRole { get; set; } = role;
 }
 
-public class AddUserCommandHandler(IDataContext context, ISecretHasher secretHasher) : IRequestHandler<AddUserCommand, Result>
+public class AddUserCommandHandler(IDataContext context, ISecretHasher secretHasher, IEmailSender emailSender) : IRequestHandler<AddUserCommand, Result>
 {
     private readonly IDataContext _context = context;
     private readonly ISecretHasher _secretHasher = secretHasher;
-
+    private readonly IEmailSender _emailSender = emailSender;
     public async Task<Result> Handle(AddUserCommand request, CancellationToken cancellationToken)
     {
         // Validate input (same as before)
@@ -29,8 +29,7 @@ public class AddUserCommandHandler(IDataContext context, ISecretHasher secretHas
 
         if (!result.IsValid)
         {
-            string errors = string.Join("\n", Utils.GetPrintableErrorList(result.Errors));
-            return Result.Failure<string>(errors);
+            return Result.Failure<string>(Utils.GetPrintableErrorString(result.Errors));
         }
 
         //confirm the email is not in the database
@@ -61,10 +60,11 @@ public class AddUserCommandHandler(IDataContext context, ISecretHasher secretHas
         await _context.Users.AddAsync(user, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
+        await _emailSender.SendEmailAsync(request.User.Email, request.User.FirstName);
         return Result.Success(user);
     }
 
-    private long GenerateRandomAccountNumber()
+    private static long GenerateRandomAccountNumber()
     {
         var random = new Random();
         long accountId = 0;

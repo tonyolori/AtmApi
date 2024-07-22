@@ -16,11 +16,9 @@ var jwtKey = builder.Configuration.GetSection("Jwt:Key").Get<string>();
 
 //clean code stuff here 
 builder.Services
-    .AddApplication()
-    .AddInfrastructure();
+    .AddApplication(builder.Configuration)
+    .AddInfrastructure(builder.Configuration);
 
-//builder.Host.UseSerilog((context, configuration) =>
-//configuration.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  .AddJwtBearer(options =>
@@ -38,16 +36,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  });
 
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
-
-
-// Register MediatR
-//builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
-
-
-
 
 
 builder.Services.AddControllers();
@@ -92,7 +81,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
  
-//builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
 

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Application.Common.Models;
 using Domain.Enum;
 using Microsoft.IdentityModel.Tokens;
+using System.Web.WebPages;
 
 namespace Application.Users.Queries;
 
@@ -28,7 +29,7 @@ public class GetUsersHandler(IDataContext context) : IRequestHandler<GetAllUsers
             users = FilterByRole(users, request.UserRole);
         }
 
-        if (!request.SearchValue.IsNullOrEmpty())
+        if (!request.SearchValue.IsEmpty())
         {
             users = FilterByName(users, request.SearchValue);
         }

@@ -1,0 +1,65 @@
+[33mcommit ce148cecfcd545f6dbe0441d403fd81fe0353b32[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Wed Jul 10 16:38:32 2024 +0100
+
+    make Auth and validation fixes
+
+[33mcommit cb05776ba6a3ef60ca297ea6b11bc43e78a88fdb[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Wed Jul 10 09:09:51 2024 +0100
+
+    big overhaul
+
+[33mcommit ce718701e4487dc1bae8c5fd22ea92e18687632b[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Thu Jun 20 16:39:07 2024 +0100
+
+    added fluent validation for AdminController Register endpoint
+
+[33mcommit fd70b7e1d02f3ae453ec736bf23ed13ba77ebe5b[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Thu Jun 20 15:36:03 2024 +0100
+
+    Rule bug fixed
+
+[33mcommit 6e097dc4de746ac91e1d5901db06f51e26266633[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Thu Jun 20 15:14:23 2024 +0100
+
+    Finished Fluent Validation for User Controller
+
+[33mcommit a8d7bf739e63e61ee9c3e044e80c454a33063370[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Thu Jun 20 10:34:32 2024 +0100
+
+    added all the missing files (everything)
+
+[33mcommit c8bd1a3c8550aa207971246ce61d38aa8898123e[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Wed Jun 19 12:03:04 2024 +0100
+
+    working, folder changes made and resources moved
+
+[33mcommit e5c4f75070114e13d01ead3727ea08d3ec0d3ce8[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Mon Jun 17 06:50:48 2024 +0100
+
+    seperated into folders, working now
+
+[33mcommit 56f2505cabfc1766a94492b3a4c07d0b475b8944[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Thu Jun 13 16:02:10 2024 +0100
+
+    project state pre-clean architecture
+
+[33mcommit ad29c6de3983d331afc6acdf2de2dc413d41cc25[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Tue Jun 11 13:23:53 2024 +0100
+
+    Add project files.
+
+[33mcommit d35d1a3703effad9c84d0698210757c3b628c5a6[m
+Author: Tony O <Anthonyolori123@gmail.com>
+Date:   Tue Jun 11 13:23:42 2024 +0100
+
+    Add .gitattributes, .gitignore, and README.md.

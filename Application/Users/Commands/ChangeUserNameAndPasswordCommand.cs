@@ -26,7 +26,7 @@ namespace Application.Users.Commands
 
             if (!result.IsValid)
             {
-                return Result.Failure<string>(Utils.GetPrintableErrorList(result.Errors));
+                return Result.Failure<string>(Utils.GetPrintableErrorString(result.Errors));
             }
 
             Result dbUserResult = await new GetUserByEmailQueryHandler(_context).Handle(new GetUserByEmailQuery(request.User.Email), cancellationToken);
