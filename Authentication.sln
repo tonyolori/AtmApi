@@ -11,7 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "src\Domain\Domain
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "src\Infrastructure\Infrastructure.csproj", "{A430E1EE-B218-40FA-BD96-FA1530FF7ECE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Tests\Test\Test.csproj", "{428D1FF2-2F78-4BAD-A2B8-C276748F43ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.UnitTest", "Tests\Test\Application.UnitTest.csproj", "{428D1FF2-2F78-4BAD-A2B8-C276748F43ED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{70815205-3945-4E27-AEE8-CEB1807549CB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{F1A25775-94B4-406C-BBF1-79CF5BDB679B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +46,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B2F2F34F-494D-464C-BC00-443A5FFA46FF} = {F1A25775-94B4-406C-BBF1-79CF5BDB679B}
+		{9481AF8C-AD64-457A-88AB-E30156A15431} = {F1A25775-94B4-406C-BBF1-79CF5BDB679B}
+		{407A31C8-4B88-4273-8EA4-5C744DE41A98} = {F1A25775-94B4-406C-BBF1-79CF5BDB679B}
+		{A430E1EE-B218-40FA-BD96-FA1530FF7ECE} = {F1A25775-94B4-406C-BBF1-79CF5BDB679B}
+		{428D1FF2-2F78-4BAD-A2B8-C276748F43ED} = {70815205-3945-4E27-AEE8-CEB1807549CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44CAE277-A624-457E-8211-B0A0CA6121A3}
