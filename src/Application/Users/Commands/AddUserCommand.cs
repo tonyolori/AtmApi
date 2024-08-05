@@ -1,7 +1,10 @@
 ﻿using Application.Common.Models;
+using Application.Extensions;
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Enum;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -17,7 +20,8 @@ public class AddUserCommandHandler(
             IEmailService emailSender,
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager,
-            ISecretHasherService secretHasher)
+            ISecretHasherService secretHasher,
+            IValidator<AddUserCommand> validator)
  : IRequestHandler<AddUserCommand, Result>
 {
     private readonly IEmailService _emailSender = emailSender;
@@ -27,15 +31,13 @@ public class AddUserCommandHandler(
 
     public async Task<Result> Handle(AddUserCommand request, CancellationToken cancellationToken)
     {
+        await request.ValidateAsync(new AddUserCommandValidator(), cancellationToken);
+
         User? userExists = await _userManager.FindByEmailAsync(request.User.Email);
 
         if (userExists != null)
             return Result.Failure(request, "User Already Exists");
 
-        if (request.User.Pin.ToString().Length != 4)
-        {
-            return Result.Failure(request, "Invalid Pin length, Pin can only be 4 digits long");
-        }
         User user = new()
         {
             AccountNumber = GenerateRandomAccountNumber(),
@@ -52,7 +54,6 @@ public class AddUserCommandHandler(
             LastModifiedDate = DateTime.Now,
         };
 
-        //it has its inbuilt validator
         IdentityResult result = await _userManager.CreateAsync(user, request.User.Password);
 
         if (!result.Succeeded)

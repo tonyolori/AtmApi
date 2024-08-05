@@ -1,11 +1,12 @@
 ﻿using Application.Common.Models;
+using Application.Users.Commands;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Sinks.Slack;
 using System.Reflection;
-
+using Application.Users;
 namespace Application;
 
 public static class DependencyInjection

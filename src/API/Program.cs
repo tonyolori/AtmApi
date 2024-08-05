@@ -114,9 +114,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 WebApplication app = builder.Build();
 
 
-//identity
-//app.MapIdentityApi<User>();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
