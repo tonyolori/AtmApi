@@ -59,7 +59,6 @@ public class AddUserCommandHandlerTests
 
         // Assert
         Assert.True(result.Succeeded);
-        Assert.NotNull(result.Entity); // Check if a user object is returned
         Assert.Contains("created successfully", result.Message);
     }
 

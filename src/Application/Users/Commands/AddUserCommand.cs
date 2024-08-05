@@ -68,7 +68,7 @@ public class AddUserCommandHandler(
 
 
         await _emailSender.SendEmailAsync(request.User.Email, request.User.FirstName);
-        return Result.Success("User created successfully!", user, request);
+        return Result.Success(request,"User created successfully!");
 
     }
 
