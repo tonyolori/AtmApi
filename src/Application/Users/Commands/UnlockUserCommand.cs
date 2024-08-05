@@ -1,5 +1,8 @@
-﻿using Application.Common.Models;
+﻿using Application.Common;
+using Application.Common.Models;
+using Application.Validator;
 using Domain.Entities;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -16,6 +19,15 @@ public class UnlockUserCommandHandler(UserManager<User> userManager) : IRequestH
 
     public async Task<Result> Handle(UnlockUserCommand request, CancellationToken cancellationToken)
     {
+        UnlockUserCommandValidator validator = new();
+
+        ValidationResult result = validator.Validate(request);
+
+        if (!result.IsValid)
+        {
+            return Result.Failure(request, Utils.GetPrintableErrorString(result.Errors));
+        }
+
         User? user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user == null)

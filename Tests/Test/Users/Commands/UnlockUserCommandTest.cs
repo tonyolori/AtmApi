@@ -52,7 +52,7 @@ public class UnlockUserCommandHandlerTests
         // Arrange
         User user = UserFaker.GenerateInvalidUser();
 
-        UnlockUserCommand command = new() { Email = user.Email };
+        UnlockUserCommand command = new() { Email = "UserNotFound@gmail.com" };
 
         _mockUserManager.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync((User)null);
 
@@ -62,6 +62,21 @@ public class UnlockUserCommandHandlerTests
         // Assert
         Assert.False(result.Succeeded);
         Assert.Contains("User not found.", result.Message);
+    }
+    [Fact]
+    public async Task HandleInvalidEmail_ShouldReturnFailure_WhenValidaionFails()
+    {
+        // Arrange
+        User user = UserFaker.GenerateInvalidUser();
+  
+        UnlockUserCommand command = new() { Email = user.Email };
+
+        // Act
+        Result result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.Succeeded);
+        Assert.Contains("Invalid email format", result.Message);
     }
 
     [Fact]
