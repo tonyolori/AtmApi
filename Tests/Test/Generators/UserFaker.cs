@@ -109,7 +109,7 @@ public static class UserFaker
         {
             Email = "johndoe", //invalid email format
             Password = "dummypassword", //will not pass validation algo
-            Pin = 34,//too short
+            Pin = 3434,
             FirstName = "John",
             LastName = "john" //name and surname cannot be the same
         };

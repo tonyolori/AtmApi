@@ -119,4 +119,35 @@ public class AddUserCommandHandlerTests
         Assert.False(result.Succeeded);
         Assert.Equal("User Already Exists", result.Message);
     }
+
+    [Fact]
+    public async Task HandleInvalidUser_ShouldReturnFailure_WhenUserPinInvalid()
+    {
+        // Arrange
+        _mockUserManager.Setup(x => x.FindByEmailAsync(It.IsAny<string>()))
+            .ReturnsAsync((User?)null);
+
+        AddUserCommandHandler commandHandler = new(
+            _mockEmailSender.Object,
+            _mockUserManager.Object,
+            _mockRoleManager.Object,
+            _mockSecretHasher.Object);
+
+
+        UserDto user = UserFaker.GenerateValidDto();
+        user.Pin = 0;
+
+        AddUserCommand addUserCommand = new()
+        {
+            User = user,//invalid pin Length
+            UserRole = UserRole.Admin,
+        };
+
+        // Act
+        Result result = await commandHandler.Handle(addUserCommand, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.Succeeded);
+        Assert.Contains("Invalid Pin length", result.Message);
+    }
 }

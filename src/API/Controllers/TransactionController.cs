@@ -15,7 +15,7 @@ namespace Api.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        [HttpPost("balance")]
+        [HttpGet("balance")]
         public async Task<IActionResult> GetBalance()
         {
             try

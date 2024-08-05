@@ -32,6 +32,10 @@ public class AddUserCommandHandler(
         if (userExists != null)
             return Result.Failure(request, "User Already Exists");
 
+        if (request.User.Pin.ToString().Length != 4)
+        {
+            return Result.Failure(request, "Invalid Pin length, Pin can only be 4 digits long");
+        }
         User user = new()
         {
             AccountNumber = GenerateRandomAccountNumber(),
