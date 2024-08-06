@@ -63,7 +63,7 @@ public class AddUserCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleInvalidUser_ShouldReturnFailure_WhenUserCreationFails()
+    public async Task HandleValidUser_ShouldReturnFailure_WhenUserCreationFails()
     {
         // Arrange
         _mockUserManager.Setup(x => x.FindByEmailAsync(It.IsAny<string>()))
@@ -79,7 +79,7 @@ public class AddUserCommandHandlerTests
 
         AddUserCommand command = new()
         {
-            User = UserFaker.GenerateInvalidDto(),
+            User = UserFaker.GenerateValidDto(),
             UserRole = UserRole.Admin,
         };
 
@@ -121,7 +121,7 @@ public class AddUserCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleInvalidUser_ShouldReturnFailure_WhenUserPinInvalid()
+    public async Task HandleInvalidUser_ShouldReturnFailure_WhenUserPinValidationFails()
     {
         // Arrange
         _mockUserManager.Setup(x => x.FindByEmailAsync(It.IsAny<string>()))
@@ -134,12 +134,11 @@ public class AddUserCommandHandlerTests
             _mockSecretHasher.Object);
 
 
-        UserDto user = UserFaker.GenerateValidDto();
-        user.Pin = 0;
+        UserDto user = UserFaker.GenerateInvalidDto();
 
         AddUserCommand addUserCommand = new()
         {
-            User = user,//invalid pin Length
+            User = user,
             UserRole = UserRole.Admin,
         };
 
@@ -148,6 +147,9 @@ public class AddUserCommandHandlerTests
 
         // Assert
         Assert.False(result.Succeeded);
-        Assert.Contains("Invalid Pin length", result.Message);
+        Assert.Contains("First and last name cannot be the same", result.Message);
+        Assert.Contains("Invalid User Email format", result.Message);
+        Assert.Contains("Invalid Password", result.Message);
+        Assert.Contains("Invalid PIN length", result.Message);
     }
 }
