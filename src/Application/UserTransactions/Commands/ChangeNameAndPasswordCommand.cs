@@ -1,5 +1,6 @@
 ﻿using Application.Common;
 using Application.Common.Models;
+using Application.Extensions;
 using Application.Interfaces;
 using Application.Users.Commands;
 using Application.Validator;
@@ -21,13 +22,12 @@ namespace Application.UserTransactions.Commands
         private readonly ISecretHasherService _secretHasher = secretHasher;
         public async Task<Result> Handle(ChangeNameAndPasswordCommand request, CancellationToken cancellationToken)
         {
-            UserDtoValidator validator = new();
+            ValidationResult validationResult = await request.User.ValidateAsync(new UserDtoValidator(), cancellationToken);
 
-            ValidationResult result = validator.Validate(request.User);
-
-            if (!result.IsValid)
+            if (!validationResult.IsValid)
             {
-                return Result.Failure(request, Utils.GetPrintableErrorString(result.Errors));
+                string errorMessages = string.Join("\n ", validationResult.Errors.Select(e => e.ErrorMessage));
+                return Result.Failure<AddUserCommand>(errorMessages);
             }
 
             User? dbUser = await _userManager.FindByEmailAsync(request.User.Email);

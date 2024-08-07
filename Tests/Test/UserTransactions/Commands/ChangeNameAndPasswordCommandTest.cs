@@ -63,7 +63,7 @@ namespace Application.UnitTest.UserTransactions.Commands
         }
 
         [Fact]
-        public async Task Handle_InvalidEmail_ReturnsFailure()
+        public async Task Handle_EmailNotFound_ReturnsFailure()
         {
             // Arrange
             User user = UserFaker.GenerateValidUser();
@@ -92,6 +92,35 @@ namespace Application.UnitTest.UserTransactions.Commands
             // Assert
             Assert.False(result.Succeeded);
             Assert.Contains("user not found", result.Message);
+        }
+
+        [Fact]
+        public async Task Handle_InvalidEmail_ReturnsFailure()
+        {
+            // Arrange
+            User user = UserFaker.GenerateInvalidUser();
+            string newFirstName = "NewFirstName";
+            string newLastName = "NewLastName";
+            string newPassword = "123456789*";
+
+            ChangeNameAndPasswordCommandHandler handler = new(_mockUserManager.Object, _mockSecretHasher.Object);
+
+            // Act
+            Result result = await handler.Handle(new ChangeNameAndPasswordCommand
+            {
+                User = new UserDto
+                {
+                    Email = user.Email,
+                    FirstName = newFirstName,
+                    LastName = newLastName,
+                    Password = newPassword,
+                    Pin = 1234
+                }
+            }, CancellationToken.None);
+
+            // Assert
+            Assert.False(result.Succeeded);
+            Assert.Contains("Invalid email format", result.Message);
         }
 
         [Fact]
