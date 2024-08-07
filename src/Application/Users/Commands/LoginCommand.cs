@@ -1,6 +1,9 @@
 ﻿using Application.Common.Models;
+using Application.Extensions;
 using Application.Interfaces;
+using Application.Validator;
 using Domain.Entities;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,6 +28,15 @@ namespace Application.Users.Commands
 
         public async Task<Result> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
+            // Validate the request
+            ValidationResult validationResult = await request.ValidateAsync(new LoginValidator(), cancellationToken);
+
+            if (!validationResult.IsValid)
+            {
+                string errorMessages = string.Join("\n ", validationResult.Errors.Select(e => e.ErrorMessage));
+                return Result.Failure<AddUserCommand>(errorMessages);
+            }
+
             User? user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {

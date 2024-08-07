@@ -64,7 +64,7 @@ namespace Test.Users.Commands
 
 
         [Fact]
-        public async Task Handle_InvalidEmail_ReturnsFailure()
+        public async Task Handle_EmailNotFound_ReturnsFailure()
         {
             //Arrange 
             User validUser = UserFaker.GenerateValidUser();
@@ -81,7 +81,7 @@ namespace Test.Users.Commands
             LoginCommandHandler handler = new(_mockAuthHelper.Object, _mockUserManager.Object, _mockSignInManager.Object);
 
             //Act 
-            Result result = await handler.Handle(new LoginCommand { Email = "ThisIsNotAnEmailInTheDatabase@Test.com", Password = "" }, CancellationToken.None);
+            Result result = await handler.Handle(new LoginCommand { Email = "ThisIsNotAnEmailInTheDatabase@Test.com", Password = validUser.PasswordHash }, CancellationToken.None);
 
             //Assert
             Assert.False(result.Succeeded);
@@ -89,6 +89,33 @@ namespace Test.Users.Commands
 
         }
 
+        [Fact]
+        public async Task Handle_ValidationFailure_ReturnsFailure()
+        {
+            //Arrange 
+            User invalidUser = UserFaker.GenerateInvalidUser();
+
+            _mockAuthHelper.Setup(x => x.GenerateJWTToken(It.IsAny<List<Claim>>())).Returns("This is a Valid Jwt Token");
+            _mockUserManager.Setup(x => x.FindByEmailAsync(It.IsAny<string>()))
+                    .ReturnsAsync((User?)null);
+            _mockUserManager.Setup(x => x.GetRolesAsync(It.IsAny<User>()))
+                    .Returns(Task.FromResult<IList<string>>(["Admin"]));
+            _mockSignInManager.Setup(x => x.PasswordSignInAsync(It.IsAny<User>(), It.IsAny<string>(),
+                It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.FromResult(SignInResult.Success));
+
+
+            LoginCommandHandler handler = new(_mockAuthHelper.Object, _mockUserManager.Object, _mockSignInManager.Object);
+
+            //Act 
+            Result result = await handler.Handle(new LoginCommand { Email = invalidUser.Email, Password = invalidUser.PasswordHash }, CancellationToken.None);
+
+            //Assert
+            Assert.False(result.Succeeded);
+            Assert.Contains("Invalid email format", result.Message);
+            Assert.Contains("Password must be at least 8 characters long", result.Message);
+            Assert.Contains("Password must contain at least one number", result.Message);
+
+        }
         [Fact]
         public async Task Handle_SignIn_AccountLockedOut()
         {
@@ -102,7 +129,7 @@ namespace Test.Users.Commands
             LoginCommandHandler handler = new(_mockAuthHelper.Object, _mockUserManager.Object, _mockSignInManager.Object);
 
             // Act
-            Result result = await handler.Handle(new LoginCommand { Email = user.Email, Password = "invalidPassword" }, CancellationToken.None);
+            Result result = await handler.Handle(new LoginCommand { Email = user.Email, Password = user.PasswordHash }, CancellationToken.None);
 
             // Assert
             Assert.False(result.Succeeded);
@@ -122,7 +149,7 @@ namespace Test.Users.Commands
             LoginCommandHandler handler = new(_mockAuthHelper.Object, _mockUserManager.Object, _mockSignInManager.Object);
 
             // Act
-            Result result = await handler.Handle(new LoginCommand { Email = user.Email, Password = "invalidPassword" }, CancellationToken.None);
+            Result result = await handler.Handle(new LoginCommand { Email = user.Email, Password = user.PasswordHash }, CancellationToken.None);
 
             // Assert
             Assert.False(result.Succeeded);
@@ -142,7 +169,7 @@ namespace Test.Users.Commands
             LoginCommandHandler handler = new(_mockAuthHelper.Object, _mockUserManager.Object, _mockSignInManager.Object);
 
             // Act
-            Result result = await handler.Handle(new() { Email = user.Email, Password = "invalidPassword" }, CancellationToken.None);
+            Result result = await handler.Handle(new() { Email = user.Email, Password = "wrong Password1*" }, CancellationToken.None);
 
             // Assert
             Assert.False(result.Succeeded);

@@ -15,7 +15,7 @@ public static class UserFaker
             AccountNumber = 1234567891,
             UserName = "johndoe",
             Email = "johndoe@example.com",
-            PasswordHash = "dummypasswordhash", // Replace with a secure hashing algorithm
+            PasswordHash = "dummypasswordhash1*", 
             Pin = "hashedPin",
             FirstName = "John",
             LastName = "Doe",
@@ -30,7 +30,7 @@ public static class UserFaker
         {
             Id = "11",
             AccountNumber = 12,
-            Email = "",
+            Email = "ads",
             PasswordHash = "", // Replace with a secure hashing algorithm
             Pin = "hashedPin",
             FirstName = "John",
