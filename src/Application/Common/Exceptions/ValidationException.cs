@@ -1,9 +1,4 @@
 ﻿using FluentValidation.Results;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Common.Exceptions;
 
@@ -14,20 +9,13 @@ public class ValidationException : Exception
     {
         Errors = new Dictionary<string, string[]>();
     }
-
     public ValidationException(IEnumerable<ValidationFailure> failures)
         : this()
     {
-        IEnumerable<IGrouping<string, string>> failureGroups = failures
-            .GroupBy(e => e.PropertyName, e => e.ErrorMessage);
-
-        foreach (IGrouping<string, string> failureGroup in failureGroups)
-        {
-            string propertyName = failureGroup.Key;
-            string[] propertyFailures = failureGroup.ToArray();
-
-            Errors.Add(propertyName, propertyFailures);
-        }
+        //Errors = failures.GroupBy(f => f.PropertyName)
+        //                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+        Errors = failures.GroupBy(f => f.PropertyName)
+                       .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
     }
 
     public IDictionary<string, string[]> Errors { get; }
@@ -35,17 +23,11 @@ public class ValidationException : Exception
     public string GetErrors()
     {
         string errors = string.Empty;
-        try
+        foreach (var (propertyName, errorMessages) in Errors)
         {
-            if (Errors.Any())
-            {
-                foreach (KeyValuePair<string, string[]> error in Errors)
-                {
-                    _ = string.Concat(",", error);
-                }
-            }
-            return errors.TrimEnd(';');
+            //{propertyName}, 
+            errors += ($"{string.Join(", ", errorMessages)}");
         }
-        catch (Exception) { return errors; }
+        return errors;
     }
 }

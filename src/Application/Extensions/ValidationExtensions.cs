@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Application.Common.Exceptions;
+using FluentValidation;
 using FluentValidation.Results;
 
 
@@ -7,6 +8,13 @@ public static class ValidationExtension
 {
     public static async Task<ValidationResult> ValidateAsync<T>(this T request, IValidator<T> validator, CancellationToken cancellationToken = default)
     {
-        return await validator.ValidateAsync(request, cancellationToken);
+        ValidationResult validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+        {
+            throw new Common.Exceptions.ValidationException(validationResult.Errors);
+        }
+
+        return validationResult;
     }
 }

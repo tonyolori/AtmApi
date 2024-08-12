@@ -30,7 +30,7 @@ public class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionH
 
                 case ValidationException validationException:
                     response.StatusCode = StatusCodes.Status400BadRequest;
-                    msg = $"{validationException.Message ?? validationException.InnerException.Message}. Error : {validationException.GetErrors()}";
+                    msg = $"{validationException.Message ?? validationException.InnerException.Message}. {validationException.GetErrors()}";
                     break;
 
                 case NotFoundException _:

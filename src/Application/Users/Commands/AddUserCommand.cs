@@ -4,11 +4,11 @@ using Application.Interfaces;
 using Application.Validator;
 using Domain.Entities;
 using Domain.Enum;
-using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System.Web.Mvc;
+using Application.Common.Exceptions;
 
 namespace Application.Users.Commands;
 
@@ -32,14 +32,8 @@ public class AddUserCommandHandler(
 
     public async Task<Result> Handle(AddUserCommand request, CancellationToken cancellationToken)
     {
-        // Validate the request
-        ValidationResult validationResult = await request.ValidateAsync(new AddUserCommandValidator(), cancellationToken);
+        await request.ValidateAsync(new AddUserCommandValidator(), cancellationToken);
 
-        if (!validationResult.IsValid)
-        {
-            string errorMessages = string.Join("\n ", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result.Failure<AddUserCommand>(errorMessages);
-        }
         User? userExists = await _userManager.FindByEmailAsync(request.User.Email);
 
         if (userExists != null)
