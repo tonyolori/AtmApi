@@ -17,7 +17,6 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 string? jwtIssuer = builder.Configuration.GetSection("Jwt:Issuer").Get<string>();
 string? jwtKey = builder.Configuration.GetSection("Jwt:Key").Get<string>();
 
-//clean code stuff here 
 builder.Services
     .AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration);
